@@ -103,7 +103,7 @@
 <div class="wrap">
   <header>
     <h1>2026학년도 2학기 1차 정기시험 선택과목 자리배치도</h1>
-    <div class="sub">2학년 · 10/13(화)~10/16(금) · 응시자는 앞문(복도) 쪽부터 연속 배치 · 4·5반 27석 배치, 나머지 6X4 · 6·7반은 앞문이 왼쪽</div>
+    <div class="sub">2학년 · 10/13(화)~10/16(금) · 응시자는 앞문(복도) 쪽부터 연속 배치 · 4·5반 27석 배치, 나머지 6X4 · 5·6·7반은 앞문이 왼쪽</div>
   </header>
   <div class="bar"><div class="tabs" id="classTabs"></div></div>
   <div class="datebar" id="dateBar"></div>
@@ -172,7 +172,7 @@ const LBL_4=["19~24번","13~18번","7~12번","1~6번(앞문)"];
 // 4반·5반: 25명 이상 학급 배치 예시(27석, 맨 앞줄 양끝 비움)
 const GRID_5=[[null,17,11,5,null],[23,18,12,6,1],[24,19,13,7,2],[25,20,14,8,3],[26,21,15,9,4],[27,22,16,10,null]];
 const LBL_5=["23~27번","17~22번","11~16번","5~10번","1~4번(앞문)"];
-const LEFT_CORRIDOR=['2-6','2-7'];
+const LEFT_CORRIDOR=['2-5','2-6','2-7'];
 function gridFor(cls){
   const five=(cls==='2-4'||cls==='2-5');
   let grid=five?GRID_5:GRID_4, labels=five?LBL_5:LBL_4;
