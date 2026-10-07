@@ -1,0 +1,357 @@
+<title>2학기 1차 선택과목 자리배치도</title>
+<style>
+  /* Layout: 반 탭 → 날짜 → 교시별 교실 배치도(교탁 위, 앞문은 복도 쪽) + 명단 수정 패널 */
+  :root{
+    --bg:#EEF2FF; --surface:#FFFFFF; --soft:#F8FAFC; --ink:#1E293B; --muted:#64748B; --border:#CBD5E1;
+    --navy:#312E81; --on-navy:#FFFFFF; --head1:#3730A3; --head2:#4F46E5;
+    --ok:#15803D; --warn:#B45309; --bad:#B91C1C; --edited:#FEF3C7; --edited-ink:#92400E;
+    --font:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --bg:#0E1120; --surface:#171B2E; --soft:#12162A; --ink:#E2E8F0; --muted:#94A3B8; --border:#334155;
+    --navy:#A5B4FC; --on-navy:#111827; --head1:#312E81; --head2:#4338CA;
+    --ok:#4ADE80; --warn:#FBBF24; --bad:#F87171; --edited:#422006; --edited-ink:#FCD34D; color-scheme:dark;}}
+  :root[data-theme="dark"]{
+    --bg:#0E1120; --surface:#171B2E; --soft:#12162A; --ink:#E2E8F0; --muted:#94A3B8; --border:#334155;
+    --navy:#A5B4FC; --on-navy:#111827; --head1:#312E81; --head2:#4338CA;
+    --ok:#4ADE80; --warn:#FBBF24; --bad:#F87171; --edited:#422006; --edited-ink:#FCD34D; color-scheme:dark;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1320px;margin:0 auto;}
+  header{background:linear-gradient(135deg,var(--head1),var(--head2));color:#fff;padding:20px 28px;}
+  header h1{margin:0;font-size:24px;font-weight:800;text-wrap:balance;}
+  header .sub{font-size:13px;opacity:.92;margin-top:4px;}
+  .bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;}
+  .tab{position:relative;padding:8px 16px;border:1px solid var(--border);background:var(--surface);border-radius:8px 8px 0 0;cursor:pointer;font-size:14px;font-weight:700;color:var(--ink);font-family:inherit;}
+  .tab.on{background:var(--navy);color:var(--on-navy);border-color:var(--navy);}
+  .tab .dot{position:absolute;top:3px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--warn);}
+  .datebar{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;background:var(--soft);border-bottom:1px solid var(--border);}
+  .datebtn{padding:7px 16px;border:1.5px solid var(--navy);background:var(--surface);border-radius:22px;cursor:pointer;font-size:13px;font-weight:700;color:var(--navy);font-family:inherit;}
+  .datebtn.on{background:var(--navy);color:var(--on-navy);}
+  .legendbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);}
+  .lchip{display:inline-flex;align-items:center;gap:5px;}
+  .lbox{width:22px;height:14px;border-radius:3px;border:1.5px solid;}
+  .toolbar{padding:12px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{background:var(--navy);color:var(--on-navy);border:none;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn.gray{background:var(--surface);color:var(--ink);border:1px solid var(--border);}
+  .btn.danger{background:var(--bad);color:#fff;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--navy);outline-offset:2px;}
+  .note{font-size:12px;color:var(--muted);}
+  .editedtag{font-size:12px;font-weight:700;background:var(--edited);color:var(--edited-ink);border-radius:12px;padding:3px 10px;}
+  .status{font-size:13px;font-weight:700;}
+  .status.ok{color:var(--ok);} .status.bad{color:var(--bad);}
+  #sheets{padding:0 20px 30px;}
+
+  .selfstudy{margin:8px 0;padding:8px 14px;background:var(--soft);border:1px dashed var(--border);border-radius:8px;color:var(--muted);font-size:13px;font-weight:600;}
+  .overflow{margin:8px 18px 0;padding:8px 12px;border-radius:8px;background:var(--edited);color:var(--edited-ink);font-size:13px;font-weight:700;}
+
+  .sheet{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin:16px 0;overflow:hidden;}
+  .phead{padding:12px 18px;color:#fff;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:800;}
+  .phead .clsbadge{background:rgba(255,255,255,.92);color:#1E293B;border-radius:8px;padding:3px 12px;font-size:18px;font-weight:900;}
+  .phead .pno{font-size:16px;font-weight:800;opacity:.95;}
+  .phead .subj{font-size:29px;font-weight:900;letter-spacing:-.5px;}
+  .phead .datepill{background:rgba(255,255,255,.28);border-radius:14px;padding:2px 12px;font-size:13px;}
+  .phead .cnt{margin-left:auto;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .room{position:relative;padding:18px 56px 14px;}
+  .podium{margin:0 auto 8px;width:360px;max-width:72%;text-align:center;color:#fff;border-radius:8px;padding:11px;font-weight:900;letter-spacing:1px;font-size:20px;}
+  .doorR{position:absolute;right:14px;writing-mode:vertical-rl;font-size:12px;font-weight:800;border:2px dashed;border-radius:6px;padding:8px 4px;background:var(--surface);}
+  .doorL{right:auto;left:14px;}
+  .door-front{top:64px;color:#B45309;border-color:#F59E0B;}
+  .door-back{bottom:30px;color:#7C3AED;border-color:#A78BFA;}
+  .collabels{display:grid;gap:10px;margin-bottom:5px;padding:0 2px;}
+  .collabel{text-align:center;font-size:11px;color:var(--muted);font-weight:700;}
+  .grid{display:grid;gap:10px;}
+  .seat{border:2px solid var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);position:relative;padding:6px;min-height:78px;min-width:0;}
+  .seat .sno{position:absolute;top:4px;left:8px;font-size:11px;color:var(--muted);font-weight:700;}
+  .seat .nm{font-size:21px;font-weight:800;line-height:1.1;margin-top:6px;overflow-wrap:anywhere;text-align:center;}
+  .seat .badge{margin-top:5px;font-size:11px;font-weight:800;border-radius:10px;padding:1px 9px;}
+  .seat.no{border-style:dashed;}
+  .seat.gap{border:none;background:transparent;}
+  .seat.no .nm{color:var(--muted);}
+  .seat.no .badge{color:var(--muted);background:var(--soft);}
+  .takerlist{padding:10px 18px 16px;font-size:13px;color:var(--ink);border-top:1px solid var(--border);}
+
+  /* 명단 수정 패널 */
+  .editor{margin:0 20px 16px;background:var(--surface);border:2px solid var(--navy);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+  .editor h2{margin:0;font-size:18px;}
+  .editor .help{font-size:12px;color:var(--muted);line-height:1.5;}
+  .tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;}
+  table.ed{border-collapse:collapse;width:100%;font-size:13px;min-width:820px;}
+  table.ed th,table.ed td{border-bottom:1px solid var(--border);padding:5px 6px;text-align:center;white-space:nowrap;}
+  table.ed th{background:var(--soft);color:var(--muted);font-size:12px;position:sticky;top:0;}
+  table.ed tr.out td{opacity:.45;}
+  table.ed input[type=number]{width:52px;font:inherit;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums;}
+  table.ed input[type=text]{width:110px;font:inherit;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--ink);}
+  table.ed input[type=checkbox]{width:17px;height:17px;}
+  .edrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;font-weight:700;color:var(--bad);}
+
+  @media (max-width:640px){
+    header{padding:16px;} header h1{font-size:19px;}
+    .bar,.datebar,.legendbar,.toolbar{padding-left:16px;padding-right:16px;}
+    #sheets{padding:0 12px 24px;} .editor{margin:0 12px 16px;}
+    .room{padding:12px 10px;} .doorR{display:none;}
+    .grid,.collabels{gap:5px;} .seat{min-height:56px;padding:4px;}
+    .seat .nm{font-size:14px;} .seat .badge{font-size:10px;padding:0 6px;}
+    .phead .subj{font-size:22px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>2026학년도 2학기 1차 정기시험 선택과목 자리배치도</h1>
+    <div class="sub">2학년 · 10/13(화)~10/16(금) · 응시자는 앞문(복도) 쪽부터 연속 배치 · 4·5반 27석 배치, 나머지 6X4 · 6·7·9반은 앞문이 왼쪽</div>
+  </header>
+  <div class="bar"><div class="tabs" id="classTabs"></div></div>
+  <div class="datebar" id="dateBar"></div>
+  <div class="legendbar" id="legend"></div>
+  <div class="toolbar">
+    <button class="btn" id="editBtn" type="button">명단 수정</button>
+    <span id="editedTag" class="editedtag" hidden></span>
+    <span id="status" class="status" role="status"></span>
+    <span id="roNote" class="note" hidden></span>
+  </div>
+  <section class="editor" id="editor" hidden>
+    <h2 id="edTitle">명단 수정</h2>
+    <div class="help">이름·번호를 고치거나, 응시 과목 체크를 바꾸거나, 자퇴·전출 학생은 <b>제외</b>를 체크하세요. 전입생은 <b>학생 추가</b>로 넣습니다. <b>저장</b>하면 이 페이지를 여는 모든 선생님 화면에 바로 반영됩니다.</div>
+    <div class="tblwrap"><table class="ed"><thead id="edHead"></thead><tbody id="edBody"></tbody></table></div>
+    <div class="edrow">
+      <button class="btn gray" id="addBtn" type="button">+ 학생 추가</button>
+      <span style="flex:1"></span>
+      <button class="btn gray" id="cancelBtn" type="button">취소</button>
+      <button class="btn" id="saveBtn" type="button">저장</button>
+    </div>
+    <div class="edrow" id="resetRow">
+      <button class="btn gray" id="resetBtn" type="button">원래 명단으로 되돌리기</button>
+      <span class="confirm" id="resetConfirm" hidden>이 반의 수정 내용을 모두 지울까요?
+        <button class="btn danger" id="resetYes" type="button">되돌리기</button>
+        <button class="btn gray" id="resetNo" type="button">아니요</button></span>
+    </div>
+  </section>
+  <div id="sheets"></div>
+</div>
+
+<script>
+const BASE = {"2-1": {"students": [{"num": 1, "name": "고성호", "subjects": ["도시의미래탐구", "윤리와사상", "인공지능기초", "드로잉", "일본어회화"]}, {"num": 2, "name": "권보민", "subjects": ["문학과영상", "기후변화와지속가능한세계", "지구시스템과학", "음악과문화", "일본어회화"]}, {"num": 3, "name": "권지영", "subjects": ["문학과영상", "도시의미래탐구", "기후변화와지속가능한세계", "드로잉", "일본어회화"]}, {"num": 4, "name": "김민찬", "subjects": ["문학과영상", "윤리와사상", "전자기와양자", "음악과문화", "일본어회화"]}, {"num": 5, "name": "김범식", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "인공지능기초", "음악과문화", "일본어회화"]}, {"num": 6, "name": "김시연", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "정치", "법과사회", "일본어회화"]}, {"num": 7, "name": "김태윤", "subjects": ["문학과영상", "기후변화와지속가능한세계", "음악과문화", "드로잉", "일본어회화"]}, {"num": 9, "name": "박지솔", "subjects": ["문학과영상", "도시의미래탐구", "윤리와사상", "드로잉", "일본어회화"]}, {"num": 10, "name": "서민경", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "법과사회", "음악과문화", "일본어회화"]}, {"num": 11, "name": "신승은", "subjects": ["역사로탐구하는현대세계", "정치", "법과사회", "음악과문화", "일본어회화"]}, {"num": 12, "name": "신지우", "subjects": ["문학과영상", "도시의미래탐구", "윤리와사상", "드로잉", "일본어회화"]}, {"num": 13, "name": "안희준", "subjects": ["역사로탐구하는현대세계", "정치", "법과사회", "인공지능기초", "일본어회화"]}, {"num": 14, "name": "오예린", "subjects": ["문학과영상", "영미문학읽기", "역사로탐구하는현대세계", "윤리와사상", "일본어회화"]}, {"num": 15, "name": "원호연", "subjects": ["역사로탐구하는현대세계", "도시의미래탐구", "기후변화와지속가능한세계", "법과사회", "일본어회화"]}, {"num": 16, "name": "유다연", "subjects": ["정치", "법과사회", "전자기와양자", "음악과문화", "일본어회화"]}, {"num": 17, "name": "유수아", "subjects": ["문학과영상", "도시의미래탐구", "법과사회", "세포와물질대사", "일본어회화"]}, {"num": 18, "name": "이도윤", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "윤리와사상", "법과사회", "일본어회화"]}, {"num": 19, "name": "이예찬", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "윤리와사상", "정치", "일본어회화"]}, {"num": 20, "name": "이지아", "subjects": ["문학과영상", "법과사회", "인공지능기초", "드로잉", "일본어회화"]}, {"num": 21, "name": "이지우", "subjects": ["문학과영상", "기후변화와지속가능한세계", "음악과문화", "드로잉", "일본어회화"]}, {"num": 22, "name": "이충훈", "subjects": ["도시의미래탐구", "전자기와양자", "세포와물질대사", "인공지능기초", "일본어회화"]}, {"num": 23, "name": "이호재", "subjects": ["문학과영상", "윤리와사상", "인공지능기초", "음악과문화", "일본어회화"]}, {"num": 24, "name": "정인우", "subjects": ["영미문학읽기", "기후변화와지속가능한세계", "인공지능기초", "드로잉", "일본어회화"]}, {"num": 25, "name": "조성혁", "subjects": ["문학과영상", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "음악과문화", "일본어회화"]}]}, "2-2": {"students": [{"num": 1, "name": "김가인", "subjects": ["문학과영상", "기후변화와지속가능한세계", "세포와물질대사", "드로잉", "일본어회화"]}, {"num": 2, "name": "김소율", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "일본어회화"]}, {"num": 3, "name": "김시우", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "정치", "법과사회", "일본어회화"]}, {"num": 4, "name": "김유준", "subjects": ["문학과영상", "역사로탐구하는현대세계", "도시의미래탐구", "윤리와사상", "일본어회화"]}, {"num": 5, "name": "김지후", "subjects": ["기하", "역사로탐구하는현대세계", "전자기와양자", "드로잉", "일본어회화"]}, {"num": 6, "name": "김하윤", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "윤리와사상", "법과사회", "일본어회화"]}, {"num": 7, "name": "김하은", "subjects": ["문학과영상", "역사로탐구하는현대세계", "정치", "법과사회", "일본어회화"]}, {"num": 9, "name": "박수아", "subjects": ["문학과영상", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "드로잉", "일본어회화"]}, {"num": 10, "name": "서하은", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "정치", "지구시스템과학", "일본어회화"]}, {"num": 11, "name": "손수빈", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 12, "name": "손정민", "subjects": ["도시의미래탐구", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 13, "name": "송태호", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "드로잉", "일본어회화"]}, {"num": 14, "name": "안지후", "subjects": ["문학과영상", "역사로탐구하는현대세계", "도시의미래탐구", "지구시스템과학", "일본어회화"]}, {"num": 15, "name": "원준희", "subjects": ["기하", "도시의미래탐구", "전자기와양자", "지구시스템과학", "일본어회화"]}, {"num": 16, "name": "이가은", "subjects": ["도시의미래탐구", "법과사회", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 17, "name": "이수빈", "subjects": ["문학과영상", "윤리와사상", "인공지능기초", "드로잉", "일본어회화"]}, {"num": 18, "name": "이영민", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "윤리와사상", "드로잉", "일본어회화"]}, {"num": 19, "name": "이준희", "subjects": ["기하", "도시의미래탐구", "기후변화와지속가능한세계", "전자기와양자", "일본어회화"]}, {"num": 20, "name": "이지후", "subjects": ["역사로탐구하는현대세계", "정치", "세포와물질대사", "드로잉", "일본어회화"]}, {"num": 21, "name": "장정훈", "subjects": ["문학과영상", "윤리와사상", "법과사회", "드로잉", "일본어회화"]}, {"num": 22, "name": "정영빈", "subjects": ["문학과영상", "도시의미래탐구", "윤리와사상", "인공지능기초", "일본어회화"]}, {"num": 23, "name": "정장욱", "subjects": ["기하", "도시의미래탐구", "세포와물질대사", "인공지능기초", "일본어회화"]}, {"num": 24, "name": "최서영", "subjects": ["문학과영상", "윤리와사상", "지구시스템과학", "드로잉", "일본어회화"]}]}, "2-3": {"students": [{"num": 1, "name": "김나현", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 2, "name": "김도윤", "subjects": ["기하", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 3, "name": "김동민", "subjects": ["윤리와사상", "법과사회", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 4, "name": "김수용", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "법과사회", "세포와물질대사", "일본어회화"]}, {"num": 5, "name": "김승준", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 6, "name": "김지원", "subjects": ["영미문학읽기", "기후변화와지속가능한세계", "법과사회", "인공지능기초", "일본어회화"]}, {"num": 7, "name": "김하윤", "subjects": ["문학과영상", "기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "일본어회화"]}, {"num": 8, "name": "노태린", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "법과사회", "세포와물질대사", "일본어회화"]}, {"num": 9, "name": "서민지", "subjects": ["문학과영상", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "법과사회", "일본어회화"]}, {"num": 10, "name": "손윤지", "subjects": ["문학과영상", "기후변화와지속가능한세계", "윤리와사상", "지구시스템과학", "일본어회화"]}, {"num": 11, "name": "신보빈", "subjects": ["역사로탐구하는현대세계", "법과사회", "전자기와양자", "지구시스템과학", "일본어회화"]}, {"num": 12, "name": "심은성", "subjects": ["문학과영상", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 13, "name": "여우주", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 14, "name": "오윤서", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "법과사회", "세포와물질대사", "일본어회화"]}, {"num": 15, "name": "오지훈", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 16, "name": "유자호", "subjects": ["기하", "역사로탐구하는현대세계", "전자기와양자", "인공지능기초", "일본어회화"]}, {"num": 17, "name": "이준성", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "일본어회화"]}, {"num": 18, "name": "이지성", "subjects": ["문학과영상", "기하", "법과사회", "인공지능기초", "일본어회화"]}, {"num": 19, "name": "임준혁", "subjects": ["영미문학읽기", "도시의미래탐구", "기후변화와지속가능한세계", "윤리와사상", "일본어회화"]}, {"num": 20, "name": "전여진", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "법과사회", "일본어회화"]}, {"num": 21, "name": "정시우", "subjects": ["역사로탐구하는현대세계", "정치", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 22, "name": "최은준", "subjects": ["기하", "역사로탐구하는현대세계", "전자기와양자", "세포와물질대사", "일본어회화"]}, {"num": 23, "name": "최자영", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 24, "name": "추민준", "subjects": ["기하", "역사로탐구하는현대세계", "물질과에너지", "세포와물질대사", "일본어회화"]}]}, "2-4": {"students": [{"num": 1, "name": "김동해", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 2, "name": "김민서", "subjects": ["문학과영상", "기후변화와지속가능한세계", "윤리와사상", "음악과문화", "중국어회화"]}, {"num": 3, "name": "김민수", "subjects": ["기하", "물질과에너지", "세포와물질대사", "음악과문화", "일본어회화"]}, {"num": 4, "name": "김지우", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 5, "name": "김진민", "subjects": ["기하", "기후변화와지속가능한세계", "전자기와양자", "물질과에너지", "일본어회화"]}, {"num": 6, "name": "남주혁", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "인공지능기초", "드로잉", "중국어회화"]}, {"num": 7, "name": "박종현", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 8, "name": "신소율", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 9, "name": "신소현", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 10, "name": "안태규", "subjects": ["기하", "윤리와사상", "전자기와양자", "세포와물질대사", "일본어회화"]}, {"num": 11, "name": "예찬", "subjects": ["기하", "기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 12, "name": "오승재", "subjects": ["영미문학읽기", "윤리와사상", "법과사회", "드로잉", "중국어회화"]}, {"num": 13, "name": "우채린", "subjects": ["도시의미래탐구", "윤리와사상", "정치", "법과사회", "일본어회화"]}, {"num": 14, "name": "원정연", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 15, "name": "윤서현", "subjects": ["도시의미래탐구", "물질과에너지", "세포와물질대사", "드로잉", "중국어회화"]}, {"num": 16, "name": "이경은", "subjects": ["역사로탐구하는현대세계", "법과사회", "음악과문화", "드로잉", "중국어회화"]}, {"num": 17, "name": "이다인", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 18, "name": "이재원", "subjects": ["문학과영상", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "음악과문화", "중국어회화"]}, {"num": 19, "name": "이태희", "subjects": ["영미문학읽기", "윤리와사상", "법과사회", "세포와물질대사", "언어생활과한자"]}, {"num": 20, "name": "임소연", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 21, "name": "전지훈", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "전자기와양자", "물질과에너지", "일본어회화"]}, {"num": 22, "name": "정다비", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "윤리와사상", "법과사회", "언어생활과한자"]}, {"num": 23, "name": "조태희", "subjects": ["기하", "기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 24, "name": "한연지", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "인공지능기초", "중국어회화"]}, {"num": 25, "name": "변하진", "subjects": ["문학과영상", "도시의미래탐구", "법과사회", "지구시스템과학", "중국어회화"]}]}, "2-5": {"students": [{"num": 1, "name": "강지빈", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "지구시스템과학", "인공지능기초", "중국어회화"]}, {"num": 2, "name": "고윤서", "subjects": ["문학과영상", "기후변화와지속가능한세계", "정치", "법과사회", "중국어회화"]}, {"num": 3, "name": "구민주", "subjects": ["윤리와사상", "정치", "법과사회", "세포와물질대사", "중국어회화"]}, {"num": 4, "name": "권지후", "subjects": ["역사로탐구하는현대세계", "도시의미래탐구", "정치", "법과사회", "중국어회화"]}, {"num": 5, "name": "김강유", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "정치", "법과사회", "중국어회화"]}, {"num": 6, "name": "김건우", "subjects": ["도시의미래탐구", "물질과에너지", "세포와물질대사", "드로잉", "중국어회화"]}, {"num": 7, "name": "김도경", "subjects": ["역사로탐구하는현대세계", "도시의미래탐구", "기후변화와지속가능한세계", "인공지능기초", "중국어회화"]}, {"num": 8, "name": "김성진", "subjects": ["문학과영상", "기후변화와지속가능한세계", "정치", "법과사회", "중국어회화"]}, {"num": 9, "name": "김예린", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "중국어회화"]}, {"num": 10, "name": "김하온", "subjects": ["기하", "물질과에너지", "세포와물질대사", "드로잉", "중국어회화"]}, {"num": 11, "name": "김하윤", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "중국어회화"]}, {"num": 12, "name": "김호연", "subjects": ["역사로탐구하는현대세계", "정치", "법과사회", "인공지능기초", "중국어회화"]}, {"num": 13, "name": "서민수", "subjects": ["도시의미래탐구", "윤리와사상", "정치", "법과사회", "중국어회화"]}, {"num": 14, "name": "서진경", "subjects": ["문학과영상", "도시의미래탐구", "기후변화와지속가능한세계", "윤리와사상", "중국어회화"]}, {"num": 15, "name": "오소은", "subjects": ["문학과영상", "기후변화와지속가능한세계", "정치", "법과사회", "중국어회화"]}, {"num": 16, "name": "오윤성", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "지구시스템과학", "음악과문화", "중국어회화"]}, {"num": 17, "name": "윤지수", "subjects": ["문학과영상", "윤리와사상", "정치", "법과사회", "중국어회화"]}, {"num": 18, "name": "이윤하", "subjects": ["도시의미래탐구", "물질과에너지", "세포와물질대사", "드로잉", "중국어회화"]}, {"num": 19, "name": "이찬영", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "도시의미래탐구", "기후변화와지속가능한세계", "중국어회화"]}, {"num": 20, "name": "임형준", "subjects": ["도시의미래탐구", "윤리와사상", "정치", "법과사회", "중국어회화"]}, {"num": 21, "name": "전우승", "subjects": ["기후변화와지속가능한세계", "정치", "법과사회", "인공지능기초", "중국어회화"]}, {"num": 22, "name": "정민경", "subjects": ["기하", "윤리와사상", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 23, "name": "정아영", "subjects": ["도시의미래탐구", "기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "중국어회화"]}, {"num": 24, "name": "최수현", "subjects": ["전자기와양자", "물질과에너지", "지구시스템과학", "인공지능기초", "중국어회화"]}, {"num": 25, "name": "팽유은", "subjects": ["문학과영상", "윤리와사상", "정치", "세포와물질대사", "중국어회화"]}]}, "2-6": {"students": [{"num": 1, "name": "공서준", "subjects": ["윤리와사상", "물질과에너지", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 2, "name": "김규연", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 3, "name": "김나경", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 4, "name": "김민규", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "윤리와사상", "중국어회화"]}, {"num": 5, "name": "김민재", "subjects": ["법과사회", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 6, "name": "김종욱", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "전자기와양자", "물질과에너지", "중국어회화"]}, {"num": 7, "name": "김준성", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "법과사회", "중국어회화"]}, {"num": 8, "name": "김태인", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 9, "name": "노호연", "subjects": ["도시의미래탐구", "윤리와사상", "전자기와양자", "물질과에너지", "중국어회화"]}, {"num": 10, "name": "문정원", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 11, "name": "박수아", "subjects": ["문학과영상", "역사로탐구하는현대세계", "기후변화와지속가능한세계", "법과사회", "중국어회화"]}, {"num": 12, "name": "배주안", "subjects": ["기하", "기후변화와지속가능한세계", "전자기와양자", "물질과에너지", "중국어회화"]}, {"num": 13, "name": "서예랑", "subjects": ["영미문학읽기", "도시의미래탐구", "윤리와사상", "음악과문화", "중국어회화"]}, {"num": 14, "name": "엄지원", "subjects": ["기하", "역사로탐구하는현대세계", "법과사회", "세포와물질대사", "중국어회화"]}, {"num": 15, "name": "위서연", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 16, "name": "유선율", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 17, "name": "유하준", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 18, "name": "이나은", "subjects": ["영미문학읽기", "역사로탐구하는현대세계", "윤리와사상", "정치", "중국어회화"]}, {"num": 20, "name": "이지우", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "법과사회", "중국어회화"]}, {"num": 21, "name": "조성현", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "윤리와사상", "지구시스템과학", "중국어회화"]}, {"num": 22, "name": "조주현", "subjects": ["기하", "윤리와사상", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 23, "name": "최민서", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "법과사회", "세포와물질대사", "중국어회화"]}, {"num": 24, "name": "최시우", "subjects": ["기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 25, "name": "최인수", "subjects": ["기하", "역사로탐구하는현대세계", "전자기와양자", "물질과에너지", "중국어회화"]}]}, "2-7": {"students": [{"num": 1, "name": "강유빈", "subjects": ["문학과영상", "도시의미래탐구", "기후변화와지속가능한세계", "드로잉", "언어생활과한자"]}, {"num": 2, "name": "강현찬", "subjects": ["문학과영상", "역사로탐구하는현대세계", "정치", "법과사회", "언어생활과한자"]}, {"num": 3, "name": "권시우", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "정치", "법과사회", "언어생활과한자"]}, {"num": 4, "name": "김건영", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 5, "name": "김단아", "subjects": ["윤리와사상", "정치", "법과사회", "드로잉", "언어생활과한자"]}, {"num": 6, "name": "김예린", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 7, "name": "김은서", "subjects": ["문학과영상", "윤리와사상", "인공지능기초", "음악과문화", "언어생활과한자"]}, {"num": 8, "name": "김은혜", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "세포와물질대사", "언어생활과한자"]}, {"num": 9, "name": "김형준", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "언어생활과한자"]}, {"num": 10, "name": "김효은", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "세포와물질대사", "언어생활과한자"]}, {"num": 11, "name": "박현선", "subjects": ["기하", "윤리와사상", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 12, "name": "배소윤", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "정치", "법과사회", "언어생활과한자"]}, {"num": 13, "name": "소지영", "subjects": ["문학과영상", "기후변화와지속가능한세계", "윤리와사상", "법과사회", "언어생활과한자"]}, {"num": 14, "name": "손예은", "subjects": ["윤리와사상", "정치", "법과사회", "인공지능기초", "언어생활과한자"]}, {"num": 15, "name": "유정완", "subjects": ["역사로탐구하는현대세계", "기후변화와지속가능한세계", "윤리와사상", "음악과문화", "언어생활과한자"]}, {"num": 16, "name": "윤한결", "subjects": ["기하", "전자기와양자", "세포와물질대사", "인공지능기초", "언어생활과한자"]}, {"num": 17, "name": "이서율", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "언어생활과한자"]}, {"num": 18, "name": "이세영", "subjects": ["역사로탐구하는현대세계", "윤리와사상", "정치", "법과사회", "언어생활과한자"]}, {"num": 19, "name": "이연오", "subjects": ["기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "지구시스템과학", "언어생활과한자"]}, {"num": 20, "name": "이예진", "subjects": ["문학과영상", "역사로탐구하는현대세계", "윤리와사상", "법과사회", "언어생활과한자"]}, {"num": 22, "name": "임태경", "subjects": ["기후변화와지속가능한세계", "윤리와사상", "세포와물질대사", "지구시스템과학", "언어생활과한자"]}, {"num": 23, "name": "정하음", "subjects": ["윤리와사상", "정치", "법과사회", "세포와물질대사", "언어생활과한자"]}, {"num": 24, "name": "황채연", "subjects": ["기후변화와지속가능한세계", "물질과에너지", "세포와물질대사", "인공지능기초", "언어생활과한자"]}]}, "2-8": {"students": [{"num": 1, "name": "강혜인", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 2, "name": "권순범", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 3, "name": "김서현", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "일본어회화"]}, {"num": 4, "name": "김연아", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 5, "name": "김우선", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "일본어회화"]}, {"num": 6, "name": "김지후", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 7, "name": "김지훈", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "일본어회화"]}, {"num": 8, "name": "문태영", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 9, "name": "박예지", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "일본어회화"]}, {"num": 10, "name": "방준혁", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 11, "name": "손정훈", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 12, "name": "손지후", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 13, "name": "신예준", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 14, "name": "안수헌", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 15, "name": "염준하", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 16, "name": "원종혁", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 17, "name": "윤지후", "subjects": ["법과사회", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 18, "name": "이세리", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 19, "name": "이하나", "subjects": ["윤리와사상", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 20, "name": "이효은", "subjects": ["윤리와사상", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 21, "name": "조예진", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 22, "name": "최정혁", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 23, "name": "허성윤", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}]}, "2-9": {"students": [{"num": 1, "name": "김선호", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 2, "name": "김성유", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "일본어회화"]}, {"num": 3, "name": "김연지", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 4, "name": "김태진", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 5, "name": "김형윤", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "중국어회화"]}, {"num": 6, "name": "맹승준", "subjects": ["전자기와양자", "물질과에너지", "지구시스템과학", "인공지능기초", "일본어회화"]}, {"num": 7, "name": "문정원", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 8, "name": "박규빈", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 9, "name": "백승아", "subjects": ["기하", "물질과에너지", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 10, "name": "백승준", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 11, "name": "서경우", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 12, "name": "신민기", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 13, "name": "안지민", "subjects": ["기하", "전자기와양자", "물질과에너지", "드로잉", "중국어회화"]}, {"num": 14, "name": "엄태웅", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 15, "name": "우지원", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 16, "name": "이동훈", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 17, "name": "이서연", "subjects": ["기하", "물질과에너지", "세포와물질대사", "지구시스템과학", "중국어회화"]}, {"num": 18, "name": "이세림", "subjects": ["기하", "윤리와사상", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 19, "name": "이호준", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 20, "name": "임성근", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 21, "name": "장채영", "subjects": ["기후변화와지속가능한세계", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}, {"num": 22, "name": "전승현", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "일본어회화"]}, {"num": 23, "name": "정준회", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "중국어회화"]}, {"num": 24, "name": "황신동", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "일본어회화"]}]}, "2-10": {"students": [{"num": 1, "name": "강태윤", "subjects": ["전자기와양자", "물질과에너지", "지구시스템과학", "인공지능기초", "언어생활과한자"]}, {"num": 2, "name": "김서윤", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 3, "name": "김채희", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "언어생활과한자"]}, {"num": 4, "name": "문이균", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 5, "name": "박건후", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "언어생활과한자"]}, {"num": 6, "name": "박세현", "subjects": ["윤리와사상", "물질과에너지", "세포와물질대사", "지구시스템과학", "언어생활과한자"]}, {"num": 7, "name": "박주하", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 8, "name": "박하린", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 9, "name": "박현진", "subjects": ["기후변화와지속가능한세계", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 10, "name": "방은서", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "언어생활과한자"]}, {"num": 11, "name": "배민우", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 12, "name": "성재현", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "언어생활과한자"]}, {"num": 13, "name": "송민규", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "인공지능기초", "언어생활과한자"]}, {"num": 14, "name": "송영빈", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 15, "name": "유서연", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 16, "name": "윤준상", "subjects": ["기하", "전자기와양자", "물질과에너지", "지구시스템과학", "언어생활과한자"]}, {"num": 17, "name": "이우리", "subjects": ["전자기와양자", "물질과에너지", "세포와물질대사", "지구시스템과학", "언어생활과한자"]}, {"num": 18, "name": "이지수", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 19, "name": "이현준", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}, {"num": 20, "name": "전재경", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 21, "name": "정성원", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "언어생활과한자"]}, {"num": 22, "name": "조성훈", "subjects": ["기하", "전자기와양자", "물질과에너지", "인공지능기초", "중국어회화"]}, {"num": 23, "name": "한지우", "subjects": ["기하", "전자기와양자", "물질과에너지", "세포와물질대사", "중국어회화"]}]}};
+const CLASSES = Object.keys(BASE);
+let OVR = {};          // 반별 수정 명단 (공유 저장소)
+let db = null, canWrite = null, readOnly = false;
+
+const COLOR = {
+  '독서와작문':['#E0E7FF','#6366F1','#3730A3'], '영어Ⅱ':['#E0E7FF','#6366F1','#3730A3'], '미적분Ⅰ':['#E0E7FF','#6366F1','#3730A3'],
+  '정치':['#DBEAFE','#3B82F6','#1E40AF'],
+  '지구시스템과학':['#DCFCE7','#22C55E','#166534'],
+  '기하':['#FEE2E2','#EF4444','#991B1B'],
+  '윤리와사상':['#EDE9FE','#8B5CF6','#5B21B6'],
+  '법과사회':['#E0F2FE','#0EA5E9','#075985'],
+  '물질과에너지':['#F3E8FF','#A855F7','#6B21A8'],
+  '문학과영상':['#FFEDD5','#F97316','#9A3412'],
+};
+const LABEL = {
+  '독서와작문':'독서와 작문(22)','영어Ⅱ':'영어Ⅱ(29)','미적분Ⅰ':'미적분Ⅰ(26)',
+  '정치':'정치(41)','지구시스템과학':'지구시스템과학(50)','기하':'기하(27)','윤리와사상':'윤리와 사상(40)',
+  '법과사회':'법과 사회(42)','물질과에너지':'물질과 에너지(48)','문학과영상':'문학과 영상(24)',
+};
+const lbl = s => LABEL[s] || s;
+const ELECTIVES = ['정치','지구시스템과학','기하','윤리와사상','법과사회','물질과에너지','문학과영상'];
+const SHORTL = {'정치':'정치','지구시스템과학':'지구시스템','기하':'기하','윤리와사상':'윤리와사상','법과사회':'법과사회','물질과에너지':'물질과에너지','문학과영상':'문학과영상'};
+
+const SCHEDULE=[
+ {date:'10/13(화)',periods:[{p:1,subjects:['독서와작문'],mode:'common'},{p:2,subjects:['정치'],mode:'elective'}]},
+ {date:'10/14(수)',periods:[{p:1,subjects:['영어Ⅱ'],mode:'common'},{p:2,subjects:['지구시스템과학'],mode:'elective'}]},
+ {date:'10/15(목)',periods:[{p:1,subjects:['기하'],mode:'elective'},{p:2,subjects:['윤리와사상'],mode:'elective'},{p:3,subjects:['법과사회'],mode:'elective'}]},
+ {date:'10/16(금)',periods:[{p:1,subjects:['미적분Ⅰ'],mode:'common'},{p:2,subjects:['물질과에너지'],mode:'elective'},{p:3,subjects:['문학과영상'],mode:'elective'}]},
+];
+
+// 좌석 그리드 (값=자리번호). 기본은 앞문(복도)이 오른쪽.
+const GRID_4=[[19,13,7,1],[20,14,8,2],[21,15,9,3],[22,16,10,4],[23,17,11,5],[24,18,12,6]];
+const LBL_4=["19~24번","13~18번","7~12번","1~6번(앞문)"];
+// 4반·5반: 25명 이상 학급 배치 예시(27석, 맨 앞줄 양끝 비움)
+const GRID_5=[[null,17,11,5,null],[23,18,12,6,1],[24,19,13,7,2],[25,20,14,8,3],[26,21,15,9,4],[27,22,16,10,null]];
+const LBL_5=["23~27번","17~22번","11~16번","5~10번","1~4번(앞문)"];
+const LEFT_CORRIDOR=['2-6','2-7','2-9'];
+function gridFor(cls){
+  const five=(cls==='2-4'||cls==='2-5');
+  let grid=five?GRID_5:GRID_4, labels=five?LBL_5:LBL_4;
+  const left=LEFT_CORRIDOR.includes(cls);
+  if(left){grid=grid.map(r=>r.slice().reverse());labels=labels.slice().reverse();}
+  return {grid,labels,cols:five?5:4,left,seats:five?27:24};
+}
+
+function rosterOf(cls){ return (OVR[cls]?OVR[cls].students:BASE[cls].students); }
+function studsOf(cls){ return rosterOf(cls).filter(s=>!s.out).slice().sort((a,b)=>a.num-b.num); }
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function buildBoard(cls,period){
+  const studs=studsOf(cls); const total=studs.length;
+  const {mode,subjects}=period;
+  let order=[], subjLabel='', color, listHtml='', takerCount=0;
+  if(mode==='common'){
+    const sj=subjects[0]; color=COLOR[sj]; subjLabel=lbl(sj);
+    order=studs.map(s=>({s,subj:sj,take:true})); takerCount=total;
+    listHtml='<b>전체 응시('+total+'명)</b> · 공통과목이라 전원 번호순 착석';
+  } else {
+    const sj=subjects[0]; color=COLOR[sj]; subjLabel=lbl(sj);
+    const tak=studs.filter(s=>s.subjects.includes(sj));
+    const rest=studs.filter(s=>!s.subjects.includes(sj));
+    if(tak.length===0) return {render:false};
+    order=tak.map(s=>({s,subj:sj,take:true})).concat(rest.map(s=>({s,subj:sj,take:false})));
+    takerCount=tak.length;
+    listHtml='<b>응시자 ('+tak.length+'명)</b>: '+tak.map(s=>esc(s.name)+'('+s.num+'번)').join(', ');
+  }
+  const seatMap={}; order.forEach((o,i)=>seatMap[i+1]=o);
+  return {render:true,seatMap,takerCount,total,subjLabel,color,listHtml,mode};
+}
+
+function renderBoard(cls,date,period){
+  const b=buildBoard(cls,period);
+  if(!b.render) return {selfstudy:true,p:period.p,label:period.subjects.map(lbl).join('/')};
+  const {grid,labels,cols,left,seats}=gridFor(cls);
+  let cells='';
+  grid.forEach(row=>row.forEach(sno=>{
+    if(sno===null){cells+='<div class="seat gap"></div>';return;}
+    const o=b.seatMap[sno];
+    if(!o){cells+='<div class="seat no"><span class="sno">'+sno+'</span></div>';return;}
+    const st=o.s;
+    if(o.take){
+      const c=COLOR[o.subj]||b.color;
+      cells+='<div class="seat" style="background:'+c[0]+';border-color:'+c[1]+'"><span class="sno" style="color:'+c[2]+'">'+sno+'</span>'
+        +'<span class="nm" style="color:'+c[2]+'">'+esc(st.name)+'</span>'
+        +'<span class="badge" style="background:'+c[1]+';color:#fff">응시</span></div>';
+    } else {
+      cells+='<div class="seat no"><span class="sno">'+sno+'</span><span class="nm">'+esc(st.name)+'</span><span class="badge">-</span></div>';
+    }
+  }));
+  const over=b.total>seats?'<div class="overflow">학생 '+b.total+'명이 좌석 '+seats+'석보다 많아 '+(b.total-seats)+'명이 배치도에 표시되지 않습니다.</div>':'';
+  const c=b.color;
+  return {html:'<div class="sheet">'
+    +'<div class="phead" style="background:'+c[1]+'"><span class="clsbadge">'+cls+'반</span><span class="pno">'+period.p+'교시</span><span class="subj">'+b.subjLabel+'</span>'
+    +'<span class="datepill">'+date+'</span><span class="cnt">응시 '+b.takerCount+'명 / 재적 '+b.total+'명</span></div>'
+    +over
+    +'<div class="room"><div class="podium" style="background:'+c[1]+'">교탁 ('+b.subjLabel+')</div>'
+    +'<div class="doorR door-front'+(left?' doorL':'')+'">앞문</div><div class="doorR door-back'+(left?' doorL':'')+'">뒷문</div>'
+    +'<div class="collabels" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+labels.map(l=>'<div class="collabel">'+l+'</div>').join('')+'</div>'
+    +'<div class="grid" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+cells+'</div></div>'
+    +'<div class="takerlist">'+b.listHtml+'</div></div>'};
+}
+
+// ===== 화면 =====
+let curClass=CLASSES[0], curDate=0;
+const $=id=>document.getElementById(id);
+function fmtTime(iso){ try{const d=new Date(iso);return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}catch(e){return '';} }
+function renderTabs(){
+  $('classTabs').innerHTML=CLASSES.map(c=>'<button type="button" class="tab'+(c===curClass?' on':'')+'" data-cls="'+c+'">'+c+'반'+(OVR[c]?'<span class="dot" title="수정된 명단"></span>':'')+'</button>').join('');
+}
+function renderDateBar(){ $('dateBar').innerHTML=SCHEDULE.map((s,i)=>'<button type="button" class="datebtn'+(i===curDate?' on':'')+'" data-date="'+i+'">'+s.date+'</button>').join(''); }
+function renderLegend(){
+  const used=[...new Set(SCHEDULE.flatMap(s=>s.periods.flatMap(p=>p.subjects)))];
+  $('legend').innerHTML='<b style="color:var(--ink)">과목 색상:</b>'+used.map(sj=>{const c=COLOR[sj];return '<span class="lchip"><span class="lbox" style="background:'+c[0]+';border-color:'+c[1]+'"></span>'+lbl(sj)+'</span>';}).join('');
+}
+function renderEditedTag(){
+  const o=OVR[curClass];
+  $('editedTag').hidden=!o;
+  if(o) $('editedTag').textContent='수정된 명단 사용 중'+(o.updatedAt?' · '+fmtTime(o.updatedAt):'');
+}
+function renderSheets(){
+  const day=SCHEDULE[curDate]; let h='';
+  day.periods.forEach(per=>{
+    const r=renderBoard(curClass,day.date,per);
+    h+= r.selfstudy ? '<div class="selfstudy">'+r.p+'교시 — 자기주도 (이 반은 '+r.label+' 응시자 없음)</div>' : r.html;
+  });
+  $('sheets').innerHTML=h;
+}
+function renderAll(){ renderTabs(); renderDateBar(); renderEditedTag(); renderSheets(); }
+
+$('classTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cls]'); if(!b)return; curClass=b.dataset.cls; closeEditor(); renderAll();});
+$('dateBar').addEventListener('click',e=>{const b=e.target.closest('[data-date]'); if(!b)return; curDate=+b.dataset.date; renderDateBar(); renderSheets();});
+
+// ===== 명단 수정 =====
+let draft=null;
+function setStatus(msg,kind){ const s=$('status'); s.textContent=msg||''; s.className='status'+(kind?' '+kind:''); }
+function openEditor(){
+  draft=rosterOf(curClass).map(s=>({num:s.num,name:s.name,subjects:[...s.subjects],out:!!s.out})).sort((a,b)=>a.num-b.num);
+  $('edTitle').textContent=curClass+'반 명단 수정';
+  $('edHead').innerHTML='<tr><th>번호</th><th>이름</th>'+ELECTIVES.map(s=>'<th>'+SHORTL[s]+'</th>').join('')+'<th>제외(자퇴·전출)</th></tr>';
+  renderEditor(); $('editor').hidden=false; $('resetRow').hidden=!OVR[curClass]; $('resetConfirm').hidden=true; setStatus('');
+  $('saveBtn').disabled=!db||readOnly;
+}
+function closeEditor(){ draft=null; $('editor').hidden=true; }
+function renderEditor(){
+  $('edBody').innerHTML=draft.map((s,i)=>'<tr class="'+(s.out?'out':'')+'">'
+    +'<td><input type="number" min="1" max="40" id="num-'+i+'" data-i="'+i+'" data-f="num" value="'+s.num+'" aria-label="번호"></td>'
+    +'<td><input type="text" id="name-'+i+'" data-i="'+i+'" data-f="name" value="'+esc(s.name)+'" aria-label="이름"></td>'
+    +ELECTIVES.map(sj=>'<td><input type="checkbox" id="sj-'+i+'-'+sj+'" data-i="'+i+'" data-sj="'+sj+'"'+(s.subjects.includes(sj)?' checked':'')+' aria-label="'+SHORTL[sj]+'"></td>').join('')
+    +'<td><input type="checkbox" id="out-'+i+'" data-i="'+i+'" data-f="out"'+(s.out?' checked':'')+' aria-label="제외"></td></tr>').join('');
+}
+$('edBody').addEventListener('input',e=>{
+  const t=e.target, i=+t.dataset.i; if(!draft||isNaN(i))return;
+  if(t.dataset.f==='num') draft[i].num=parseInt(t.value,10);
+  else if(t.dataset.f==='name') draft[i].name=t.value;
+});
+$('edBody').addEventListener('change',e=>{
+  const t=e.target, i=+t.dataset.i; if(!draft||isNaN(i))return;
+  if(t.dataset.sj){ const set=new Set(draft[i].subjects); t.checked?set.add(t.dataset.sj):set.delete(t.dataset.sj); draft[i].subjects=[...set]; }
+  else if(t.dataset.f==='out'){ draft[i].out=t.checked; t.closest('tr').className=t.checked?'out':''; }
+});
+$('editBtn').addEventListener('click',()=>{ $('editor').hidden?openEditor():closeEditor(); });
+$('cancelBtn').addEventListener('click',()=>{ closeEditor(); setStatus(''); });
+$('addBtn').addEventListener('click',()=>{
+  const max=draft.reduce((m,s)=>Math.max(m,s.num||0),0);
+  draft.push({num:max+1,name:'',subjects:[],out:false}); renderEditor();
+  const el=$('name-'+(draft.length-1)); if(el) el.focus();
+});
+$('saveBtn').addEventListener('click',async()=>{
+  if(!draft) return;
+  const rows=draft.map(s=>({num:s.num,name:String(s.name||'').trim(),subjects:s.subjects,out:!!s.out}));
+  if(rows.some(s=>!Number.isInteger(s.num)||s.num<1)){ setStatus('번호는 1 이상의 숫자로 입력하세요.','bad'); return; }
+  if(rows.some(s=>!s.name)){ setStatus('이름이 비어 있는 학생이 있습니다.','bad'); return; }
+  const nums=rows.map(s=>s.num); if(new Set(nums).size!==nums.length){ setStatus('같은 번호가 두 명 있습니다. 번호를 확인하세요.','bad'); return; }
+  rows.sort((a,b)=>a.num-b.num);
+  $('saveBtn').disabled=true; setStatus('저장 중…');
+  try{
+    await db.doc('classes/'+curClass).set({students:rows,updatedAt:new Date().toISOString()});
+    OVR[curClass]={students:rows,updatedAt:new Date().toISOString()};
+    closeEditor(); renderAll(); setStatus('저장했습니다. 모든 선생님 화면에 반영됩니다.','ok');
+  }catch(err){
+    $('saveBtn').disabled=false;
+    if(err&&err.code==='invalid_argument'){ readOnly=true; applyAccess(); setStatus('이 페이지의 보기 권한만 있어 저장할 수 없습니다. 페이지 소유자에게 편집 권한을 요청하세요.','bad'); }
+    else setStatus('저장하지 못했습니다. 잠시 후 다시 저장해 주세요.','bad');
+  }
+});
+$('resetBtn').addEventListener('click',()=>{ $('resetConfirm').hidden=false; });
+$('resetNo').addEventListener('click',()=>{ $('resetConfirm').hidden=true; });
+$('resetYes').addEventListener('click',async()=>{
+  try{ await db.doc('classes/'+curClass).delete(); delete OVR[curClass]; closeEditor(); renderAll(); setStatus('원래 명단으로 되돌렸습니다.','ok'); }
+  catch(err){ setStatus('되돌리지 못했습니다. 잠시 후 다시 시도해 주세요.','bad'); }
+});
+
+function applyAccess(){
+  const ro = !db || canWrite===false || readOnly;
+  $('editBtn').hidden = ro;
+  $('roNote').hidden = !ro;
+  $('roNote').textContent = !db ? '명단 수정은 claude.ai에 로그인한 상태에서 할 수 있습니다.' : '보기 전용입니다. 수정하려면 페이지 소유자에게 편집 권한을 요청하세요.';
+  if(ro) closeEditor();
+}
+
+renderLegend(); renderAll(); applyAccess();
+
+(async()=>{
+  try{
+    db = window.claude ? await window.claude.use('db') : null;
+    const user = window.claude ? await window.claude.use('user') : null;
+    if(user){ try{ canWrite = await user.can('data.write'); }catch(e){ canWrite=null; } }
+  }catch(e){ db=null; }
+  applyAccess();
+  if(!db) return;
+  db.collection('classes').onSnapshot(snap=>{
+    const next={};
+    snap.docs.forEach(d=>{ const v=d.data(); if(v&&Array.isArray(v.students)) next[d.id]=v; });
+    OVR=next;
+    renderTabs(); renderEditedTag();
+    if(!draft) renderSheets();
+  },()=>{});
+})();
+</script>
